@@ -11,8 +11,8 @@ class SignUpController extends Controller
     /**
      * Create an account.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param  \App\Http\Requests\Auth\SignUpRequest  $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function signUp(SignUpRequest $request)
     {
@@ -22,7 +22,7 @@ class SignUpController extends Controller
 
         $player = Player::create($validated);
 
-        $token = $player->createToken('mm')->plainTextToken;
+        $token = $player->createToken('sign-in')->plainTextToken;
 
         return response()->json([
             'data' => $player,
