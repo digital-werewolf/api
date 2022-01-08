@@ -5,6 +5,7 @@ services:
         build:
             context: ./.docker
         image: werewolf-api:latest
+        user: www-data
         volumes:
             - ./:/var/www/html
         restart: unless-stopped
@@ -19,7 +20,7 @@ services:
         working_dir: /var/www/html
         volumes:
             - ./public:/var/www/html/public
-            - ./.docker/nginx/log:/var/log/nginx
+            # - ./.docker/nginx/log:/var/log/nginx
             - ./.docker/nginx/ssl:/etc/nginx/ssl
             - ./.docker/nginx/conf:/etc/nginx/conf.d
             - ./.docker/nginx/entrypoint.sh:/docker-entrypoint.d/entrypoint.sh

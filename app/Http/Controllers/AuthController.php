@@ -4,12 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Auth\SignInRequest;
 use App\Http\Requests\Auth\SignUpRequest;
-use App\Models\Player;
-use Illuminate\Support\Facades\Hash;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use App\Services\AuthService;
 
 class AuthController extends Controller
 {
+    private AuthService $authService;
+
+    public function __construct(AuthService $authService)
+    {
+        $this->authService = $authService;
+    }
+
     /**
      * Create an account.
      *
@@ -20,11 +25,8 @@ class AuthController extends Controller
     {
         $validated = $request->validated();
 
-        $validated['password'] = bcrypt($validated['password']);
-
-        $player = Player::create($validated);
-
-        $token = $player->createToken('sign-in')->plainTextToken;
+        $player = $this->authService->createPlayer($validated);
+        $token = $this->authService->createPAT($player);
 
         return response()->json([
             'data' => $player,
@@ -42,20 +44,11 @@ class AuthController extends Controller
     {
         $validated = $request->validated();
 
-        $player = Player::where('username', $validated['usernameOrEmail'])
-            ->orWhere('username', $validated['usernameOrEmail'])
-            ->first();
-
-        $correctPassword = $player === null
-            ? false
-            : Hash::check($validated['password'], $player->password);
-
-        if ($correctPassword === false) {
-            throw new BadRequestHttpException('Username or password is incorrect.');
-        }
+        $player = $this->authService->authenticate($validated);
+        $token = $this->authService->createPAT($player);
 
         return response()->json([
-            'token' => $player->createToken('sign-in')->plainTextToken,
+            'token' => $token,
         ]);
     }
 }
