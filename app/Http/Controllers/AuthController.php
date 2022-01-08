@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Auth\SignInRequest;
 use App\Http\Requests\Auth\SignUpRequest;
 use App\Services\AuthService;
+use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
@@ -13,6 +14,7 @@ class AuthController extends Controller
     public function __construct(AuthService $authService)
     {
         $this->authService = $authService;
+        $this->middleware('auth:sanctum')->only(['signOut']);
     }
 
     /**
@@ -50,5 +52,20 @@ class AuthController extends Controller
         return response()->json([
             'token' => $token,
         ]);
+    }
+
+    /**
+     * Sign out of system.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function signOut(Request $request)
+    {
+        $ok = $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'data' => $ok,
+        ], 201);
     }
 }

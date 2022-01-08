@@ -43,6 +43,10 @@ class Handler extends ExceptionHandler
         $this->renderable(function (HttpException $e) {
             $error = $e->getMessage() ? $e->getMessage() : 'Unknown error';
 
+            if ($e->getStatusCode() == 404) {
+                $error = 'Not found';
+            }
+
             return response()->json(['error' => $error], $e->getStatusCode());
         });
     }

@@ -39,6 +39,8 @@ class AuthService
      *
      * @param array<string, string> $credentials
      * @return \App\Models\Player
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
      */
     public function authenticate($credentials)
     {
