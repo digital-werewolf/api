@@ -14,9 +14,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::group(['namespace' => 'Auth', 'prefix' => 'auth'], function () {
-    Route::post('/sign-up', 'SignUpController@signUp');
-    Route::post('/sign-in', 'SignInController@signIn');
+Route::group(['prefix' => 'auth'], function () {
+    Route::post('/sign-up', 'AuthController@signUp');
+    Route::post('/sign-in', 'AuthController@signIn');
+});
+
+Route::group([], function () {
+    Route::post('/profile', 'ProfileController@me');
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
