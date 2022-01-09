@@ -2,6 +2,7 @@
 
 namespace App\Exceptions;
 
+use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpFoundation\Exception\RequestExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -40,14 +41,27 @@ class Handler extends ExceptionHandler
             //
         });
 
-        $this->renderable(function (HttpException $e) {
-            $error = $e->getMessage() ? $e->getMessage() : 'Unknown error';
+        $this->renderable(function (Exception $e) {
+            $message = $e->getMessage()
+                ? $e->getMessage()
+                : 'An unknown error occurred.';
 
-            if ($e->getStatusCode() == 404) {
-                $error = 'Not found';
+            if ($e instanceof HttpException) {
+                if ($e->getStatusCode() == 404) {
+                    $message = 'Not found';
+                }
+
+                return response()->json([
+                    'status' => false,
+                    'message' => $message,
+                ], $e->getStatusCode());
             }
-
-            return response()->json(['error' => $error], $e->getStatusCode());
+            else if (!config('app.debug')) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'An unknown error occurred.',
+                ], 500);
+            }
         });
     }
 }

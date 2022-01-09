@@ -8,6 +8,8 @@ use App\Http\Requests\Auth\SignUpRequest;
 use App\Services\AuthService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Symfony\Component\CssSelector\Exception\InternalErrorException;
 
 class AuthenticationController extends Controller
 {
@@ -37,9 +39,10 @@ class AuthenticationController extends Controller
         event(new Registered($player));
 
         return response()->json([
+            'status' => true,
             'data' => $player,
             'token' => $token,
-        ], 201);
+        ], Response::HTTP_CREATED);
     }
 
     /**
@@ -56,8 +59,9 @@ class AuthenticationController extends Controller
         $token = $this->authService->createPAT($player);
 
         return response()->json([
+            'status' => true,
             'token' => $token,
-        ]);
+        ], Response::HTTP_CREATED);
     }
 
     /**
@@ -68,10 +72,13 @@ class AuthenticationController extends Controller
      */
     public function signOut(Request $request)
     {
-        $ok = $request->user()->currentAccessToken()->delete();
+        if (!$request->user()->currentAccessToken()->delete()) {
+            throw new InternalErrorException('Unable to sign out!');
+        }
 
         return response()->json([
-            'data' => $ok,
-        ], 201);
+            'status' => true,
+            'message' => 'Signed out of the system!',
+        ]);
     }
 }

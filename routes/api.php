@@ -25,8 +25,8 @@ Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
     Route::get('/verify-email/{id}/{hash}', 'EmailVerificationController@verifyEmail')->name('verification.verify');
 
     // Reset password
-    Route::post('/forgot-password', 'ResettingPasswordController@forgotPassword');
-    Route::post('/reset-password', 'ResettingPasswordController@resetPassword')->name('password.reset');
+    Route::post('/forgot-password', 'PasswordResettingController@forgotPassword');
+    Route::post('/reset-password', 'PasswordResettingController@resetPassword')->name('password.reset');
 });
 
 Route::group(['prefix' => 'profile'], function () {
