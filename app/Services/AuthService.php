@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Player;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
@@ -32,6 +33,28 @@ class AuthService
     public function createPAT(Player $player)
     {
         return $player->createToken('sign-in')->plainTextToken;
+    }
+
+    /**
+     * Revoke current Personal Access Tokens of the player.
+     *
+     * @param \App\Models\Player $player
+     * @return bool
+     */
+    public function revokePAT(Player $player)
+    {
+        return (Model::class)($player->currentAccessToken())->delete();
+    }
+
+    /**
+     * Revoke all Personal Access Tokens of the player.
+     *
+     * @param \App\Models\Player $player
+     * @return bool
+     */
+    public function revokeAllPATs(Player $player)
+    {
+        return $player->tokens()->delete();
     }
 
     /**

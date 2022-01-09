@@ -5,14 +5,18 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Profile\UpdateEmailRequest;
 use App\Http\Requests\Profile\UpdatePasswordRequest;
 use App\Http\Requests\Profile\UpdateUsernameRequest;
+use App\Services\AuthService;
 use App\Services\ProfileService;
 
 class ProfileController extends Controller
 {
+    private AuthService $authService;
+
     private ProfileService $profileService;
 
-    public function __construct(ProfileService $profileService)
+    public function __construct(AuthService $authService, ProfileService $profileService)
     {
+        $this->authService = $authService;
         $this->profileService = $profileService;
 
         $this->middleware('auth:sanctum');
@@ -81,9 +85,15 @@ class ProfileController extends Controller
             $request->safe()->only('password')['password'],
         );
 
+        // Delete old PATs
+        $this->authService->revokeAllPATs($request->user());
+
+        $token = $this->authService->createPAT($request->user());
+
         return response()->json([
             'status' => $status,
             'message' => 'Your password has been updated!',
+            'token' => $token,
         ]);
     }
 }

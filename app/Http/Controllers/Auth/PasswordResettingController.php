@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Auth\ResetPasswordRequest;
+use App\Services\AuthService;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
@@ -12,6 +13,13 @@ use Symfony\Component\CssSelector\Exception\InternalErrorException;
 
 class PasswordResettingController extends Controller
 {
+    private AuthService $authService;
+
+    public function __construct(AuthService $authService)
+    {
+        $this->authService = $authService;
+    }
+
     /**
      * Send password reset email.
      *
@@ -44,12 +52,15 @@ class PasswordResettingController extends Controller
     {
         $status = Password::reset(
             $request->safe()->only('email', 'token', 'password', 'password_confirmation'),
-            function ($user, $password) {
-                $user->forceFill([
+            function ($player, $password) {
+                $player->forceFill([
                     'password' => Hash::make($password),
                 ]);
 
-                $user->save();
+                $player->save();
+
+                // Delete old PATs
+                $this->authService->revokeAllPATs($player);
             },
         );
 

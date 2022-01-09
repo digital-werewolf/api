@@ -72,7 +72,7 @@ class AuthenticationController extends Controller
      */
     public function signOut(Request $request)
     {
-        if (!$request->user()->currentAccessToken()->delete()) {
+        if (!$this->authService->revokePAT($request->user())) {
             throw new InternalErrorException('Unable to sign out!');
         }
 
