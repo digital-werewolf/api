@@ -30,7 +30,10 @@ Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
 });
 
 Route::group(['prefix' => 'profile'], function () {
-    Route::post('/', 'ProfileController@me');
+    Route::get('/', 'ProfileController@me');
+    Route::put('/username', 'ProfileController@updateUsername');
+    Route::put('/email', 'ProfileController@updateEmail');
+    Route::put('/password', 'ProfileController@updatePassword');
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

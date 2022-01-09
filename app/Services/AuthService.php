@@ -16,7 +16,7 @@ class AuthService
      */
     public function createPlayer($player)
     {
-        $player['password'] = bcrypt($player['password']);
+        $player['password'] = Hash::make($player['password'], ['rounds' => 10]);
 
         $player = Player::create($player);
 
