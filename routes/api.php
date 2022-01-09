@@ -14,19 +14,23 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::group(['prefix' => 'auth'], function () {
-    Route::post('/sign-up', 'AuthController@signUp');
-    Route::post('/sign-in', 'AuthController@signIn');
-    Route::post('/sign-out', 'AuthController@signOut');
+Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
+    // Authenticate
+    Route::post('/sign-up', 'AuthenticationController@signUp');
+    Route::post('/sign-in', 'AuthenticationController@signIn');
+    Route::post('/sign-out', 'AuthenticationController@signOut');
+
+    // Verify email
+    Route::post('/send-verification-email', 'EmailVerificationController@sendVerificationEmail');
+    Route::get('/verify-email/{id}/{hash}', 'EmailVerificationController@verifyEmail')->name('verification.verify');
+
+    // Reset password
+    Route::post('/forgot-password', 'ResettingPasswordController@forgotPassword');
+    Route::post('/reset-password', 'ResettingPasswordController@resetPassword')->name('password.reset');
 });
 
 Route::group(['prefix' => 'profile'], function () {
     Route::post('/', 'ProfileController@me');
-});
-
-Route::group(['prefix' => 'email'], function () {
-    Route::post('/send-verification-email', 'EmailController@sendVerificationEmail');
-    Route::get('/verify-email/{id}/{hash}', 'EmailController@verifyEmail')->name('verification.verify');
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

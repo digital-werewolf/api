@@ -1,20 +1,22 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Auth;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\SignInRequest;
 use App\Http\Requests\Auth\SignUpRequest;
 use App\Services\AuthService;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 
-class AuthController extends Controller
+class AuthenticationController extends Controller
 {
     private AuthService $authService;
 
     public function __construct(AuthService $authService)
     {
         $this->authService = $authService;
+
         $this->middleware('auth:sanctum')->only(['signOut']);
     }
 
