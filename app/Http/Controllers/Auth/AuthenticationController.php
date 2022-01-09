@@ -10,6 +10,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Symfony\Component\CssSelector\Exception\InternalErrorException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class AuthenticationController extends Controller
 {
@@ -56,6 +57,12 @@ class AuthenticationController extends Controller
         $validated = $request->validated();
 
         $player = $this->authService->authenticate($validated);
+        $blockedReason = $this->authService->checkMoral($player);
+
+        if (!is_null($blockedReason)) {
+            throw new HttpException( 403, 'This account has been blocked! ' . $blockedReason);
+        }
+
         $token = $this->authService->createPAT($player);
 
         return response()->json([

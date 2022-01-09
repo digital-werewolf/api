@@ -41,4 +41,9 @@ class Player extends Authenticatable implements MustVerifyEmail, CanResetPasswor
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function blocked()
+    {
+        return $this->hasOne(BlackPlayer::class);
+    }
 }

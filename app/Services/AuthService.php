@@ -81,4 +81,20 @@ class AuthService
 
         return $player;
     }
+
+    /**
+     * Check if the player is blocked.
+     *
+     * @param \App\Models\Player $player.
+     * @return string|null
+     */
+    public function checkMoral(Player $player)
+    {
+        if (is_null($player->blocked)) {
+            return null;
+        }
+
+        return 'Reason: ' . $player->blocked->reason
+            . '. Until: ' . $player->blocked->expired_at;
+    }
 }
