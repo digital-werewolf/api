@@ -20,8 +20,13 @@ Route::group(['prefix' => 'auth'], function () {
     Route::post('/sign-out', 'AuthController@signOut');
 });
 
-Route::group([], function () {
-    Route::post('/profile', 'ProfileController@me');
+Route::group(['prefix' => 'profile'], function () {
+    Route::post('/', 'ProfileController@me');
+});
+
+Route::group(['prefix' => 'email'], function () {
+    Route::post('/send-verification-email', 'EmailController@sendVerificationEmail');
+    Route::get('/verify-email/{id}/{hash}', 'EmailController@verifyEmail')->name('verification.verify');
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

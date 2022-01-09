@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Auth\SignInRequest;
 use App\Http\Requests\Auth\SignUpRequest;
 use App\Services\AuthService;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 
 class AuthController extends Controller
@@ -29,6 +30,9 @@ class AuthController extends Controller
 
         $player = $this->authService->createPlayer($validated);
         $token = $this->authService->createPAT($player);
+
+        // Send verification email
+        event(new Registered($player));
 
         return response()->json([
             'data' => $player,

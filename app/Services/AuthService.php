@@ -48,7 +48,7 @@ class AuthService
             ->orWhere('username', $credentials['usernameOrEmail'])
             ->first();
 
-        $isCorrectPassword = $player === null
+        $isCorrectPassword = is_null($player)
             ? false
             : Hash::check($credentials['password'], $player->password);
 

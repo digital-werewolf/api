@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
 class ProfileController extends Controller
 {
     public function __construct()
@@ -11,6 +9,11 @@ class ProfileController extends Controller
         $this->middleware('auth:sanctum');
     }
 
+    /**
+     * Show player profile.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function me()
     {
         return response()->json([
