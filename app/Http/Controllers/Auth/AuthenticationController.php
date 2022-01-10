@@ -36,9 +36,6 @@ class AuthenticationController extends Controller
         $player = $this->authService->createPlayer($validated);
         $token = $this->authService->createPAT($player);
 
-        // Send verification email
-        event(new Registered($player));
-
         return response()->json([
             'status' => true,
             'data' => $player,
