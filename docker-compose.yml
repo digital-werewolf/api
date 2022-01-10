@@ -4,16 +4,17 @@ services:
     api:
         build:
             context: ./.docker
-        image: werewolf-api:latest
-        user: www-data
+        image: werewolf-api:dev-latest
         volumes:
             - ./:/var/www/html
-        restart: unless-stopped
         networks:
             - webserver-network
             - postgres-network
+            - redis-network
         depends_on:
             - postgres
+            - redis
+        restart: unless-stopped
 
     webserver:
         image: nginx:1.21.3-alpine
@@ -27,11 +28,11 @@ services:
         ports:
             - 8080:80
             - 443:443
-        restart: unless-stopped
         networks:
             - webserver-network
         depends_on:
             - api
+        restart: unless-stopped
 
     postgres:
         image: postgres:14.1-alpine3.15
@@ -41,24 +42,46 @@ services:
             - POSTGRES_PASSWORD=${DB_PASSWORD}
         volumes:
             - ./.docker/postgres/data:/var/lib/postgresql/data
-        restart: unless-stopped
         networks:
             - postgres-network
-
-    phppgadmin:
-        image: bitnami/phppgadmin:7.13.0
-        environment:
-            - DATABASE_HOST=${DB_HOST}
-            - DATABASE_PORT_NUMBER=${DB_PORT}
-        ports:
-            - 8081:8080
-            - 8443:8443
         restart: unless-stopped
+
+    adminer:
+        image: dockette/adminer:pgsql
+        ports:
+        - 8081:80
         networks:
             - postgres-network
         depends_on:
             - postgres
+        restart: unless-stopped
+
+    redis:
+        image: redis:6.2.5-alpine3.14
+        environment:
+            - REDIS_PASSWORD=${REDIS_PASSWORD}
+        volumes:
+          - ./.docker/redis/data:/data
+        command: redis-server --requirepass ${REDIS_PASSWORD}
+        networks:
+            - redis-network
+        restart: unless-stopped
+
+    rediscommander:
+        image: rediscommander/redis-commander:latest
+        environment:
+            REDIS_HOST: ${REDIS_HOST}
+            REDIS_PORT: ${REDIS_PORT}
+            REDIS_PASSWORD: ${REDIS_PASSWORD}
+        ports:
+            - 8082:8081
+        networks:
+            - redis-network
+        depends_on:
+            - redis
+        restart: unless-stopped
 
 networks:
     webserver-network:
     postgres-network:
+    redis-network:

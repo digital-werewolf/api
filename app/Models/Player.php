@@ -42,6 +42,11 @@ class Player extends Authenticatable implements MustVerifyEmail, CanResetPasswor
         'email_verified_at' => 'datetime',
     ];
 
+    /**
+     * Blocked reason of player.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
     public function blocked()
     {
         return $this->hasOne(BlackPlayer::class);
