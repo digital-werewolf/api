@@ -2,7 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\BlackPlayer;
 use App\Models\Player;
+use Carbon\Carbon;
+use DateTimeZone;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -83,18 +86,53 @@ class AuthService
     }
 
     /**
-     * Check if the player is blocked.
+     * Check if the player is locked.
      *
      * @param \App\Models\Player $player.
      * @return string|null
      */
     public function checkMoral(Player $player)
     {
-        if (is_null($player->blocked)) {
+        $lock = $player->lock;
+
+        if (is_null($lock)) {
             return null;
         }
 
-        return 'Reason: ' . $player->blocked->reason
-            . '. Until: ' . $player->blocked->expired_at;
+        $remainingTime = $this->getLockTime($lock);
+
+        if ($remainingTime <= 0) {
+            $this->unlockPlayer($lock);
+
+            return null;
+        }
+
+        return 'Reason: ' . $lock->reason
+            . '. Automatically unlock after ' . $remainingTime . ' hour(s).';
+    }
+
+    /**
+     * Get remaining lock time of the player in minutes.
+     *
+     * @param \App\Models\BlackPlayer $blackPlayer
+     * @return int
+     */
+    public function getLockTime(BlackPlayer $blackPlayer)
+    {
+        $now =  Carbon::now(new DateTimeZone('GMT'));
+        $expiredAt = Carbon::parse($blackPlayer->expired_at);
+
+        return $now->diffInMinutes($expiredAt);
+    }
+
+    /**
+     * Unlock the player.
+     *
+     * @param \App\Models\BlackPlayer $blackPlayer
+     * @return bool
+     */
+    public function unlockPlayer(BlackPlayer $blackPlayer)
+    {
+        return $blackPlayer->delete();
     }
 }
