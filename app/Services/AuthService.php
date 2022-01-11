@@ -28,6 +28,27 @@ class AuthService
     }
 
     /**
+     * Create a oauth player.
+     *
+     * @param string $email
+     * @return \App\Models\Player
+     */
+    public function createOAuthPlayer(string $email)
+    {
+        $username = substr(md5($email), 0, 10);
+
+        $player = Player::create([
+            'username' => $username,
+            'email' => $email,
+        ]);
+
+        // Verify email if create with OAuth
+        $player->markEmailAsVerified();
+
+        return $player;
+    }
+
+    /**
      * Create a Personal Access Token.
      *
      * @param \App\Models\Player $player
@@ -134,5 +155,16 @@ class AuthService
     public function unlockPlayer(BlackPlayer $blackPlayer)
     {
         return $blackPlayer->delete();
+    }
+
+    /**
+     * Get player if exist.
+     *
+     * @param string $email
+     * @return \App\Models\Player|null
+     */
+    public function existEmail(string $email)
+    {
+        return Player::where('email', $email)->first();
     }
 }

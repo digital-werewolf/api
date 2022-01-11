@@ -20,6 +20,12 @@ Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
     Route::post('/sign-in', 'AuthenticationController@signIn');
     Route::post('/sign-out', 'AuthenticationController@signOut');
 
+    // OAuth
+    Route::group(['middleware' => 'web'], function () {
+        Route::get('/{driver}/redirect', 'OAuthController@redirect');
+        Route::get('/{driver}/callback', 'OAuthController@callback');
+    });
+
     // Verify email
     Route::post('/send-verification-email', 'EmailVerificationController@sendVerificationEmail');
     Route::get('/verify-email/{id}/{hash}', 'EmailVerificationController@verifyEmail')->name('verification.verify');
