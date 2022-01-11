@@ -6,9 +6,9 @@ use App\Models\BlackPlayer;
 use App\Models\Player;
 use Carbon\Carbon;
 use DateTimeZone;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class AuthService
 {
@@ -17,12 +17,18 @@ class AuthService
      *
      * @param array<string, string> $player
      * @return \App\Models\Player
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
     public function createPlayer($player)
     {
         $player['password'] = Hash::make($player['password'], ['rounds' => 10]);
 
-        $player = Player::create($player);
+        $player = new Player($player);
+
+        if (!$player->save()) {
+            throw new HttpException(500, 'Unable to create account');
+        }
 
         return $player;
     }
@@ -32,20 +38,24 @@ class AuthService
      *
      * @param string $email
      * @return \App\Models\Player
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
     public function createOAuthPlayer(string $email)
     {
         $username = substr(md5($email), 0, 10);
 
-        $player = Player::create([
+        $player = new Player([
             'username' => $username,
             'email' => $email,
         ]);
 
-        // Verify email if create with OAuth
-        $player->markEmailAsVerified();
+        // Save player with verified email
+        if (!$player->markEmailAsVerified()) {
+            throw new HttpException(500, 'Unable to create account');
+        }
 
-        return $player;
+        return  $player;
     }
 
     /**
@@ -64,10 +74,19 @@ class AuthService
      *
      * @param \App\Models\Player $player
      * @return bool
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
     public function revokePAT(Player $player)
     {
-        return (Model::class)($player->currentAccessToken())->delete();
+        /** @var \App\Models $PAT */
+        $PAT = $player->currentAccessToken();
+
+        if (!$PAT->delete()) {
+            throw new HttpException(500, 'Unable to revoke token');
+        }
+
+        return true;
     }
 
     /**
@@ -75,10 +94,16 @@ class AuthService
      *
      * @param \App\Models\Player $player
      * @return bool
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
     public function revokeAllPATs(Player $player)
     {
-        return $player->tokens()->delete();
+        if(!$player->tokens()->delete()) {
+            throw new HttpException(500, 'Unable to revoke all tokens');
+        }
+
+        return true;
     }
 
     /**
@@ -94,6 +119,8 @@ class AuthService
         $player = Player::where('username', $credentials['usernameOrEmail'])
             ->orWhere('username', $credentials['usernameOrEmail'])
             ->first();
+
+        var_dump($player->password);
 
         $isCorrectPassword = is_null($player)
             ? false

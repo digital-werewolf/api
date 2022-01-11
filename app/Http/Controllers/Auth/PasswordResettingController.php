@@ -6,10 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Services\AuthService;
-use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
-use Symfony\Component\CssSelector\Exception\InternalErrorException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class PasswordResettingController extends Controller
 {
@@ -33,7 +32,7 @@ class PasswordResettingController extends Controller
         );
 
         if ($status !== Password::RESET_LINK_SENT) {
-            throw new InternalErrorException('Unable to send password reset email!');
+            throw new HttpException(500, 'Unable to send password reset email!');
         }
 
         return response()->json([
@@ -47,6 +46,8 @@ class PasswordResettingController extends Controller
      *
      * @param \App\Http\Requests\Auth\ResetPasswordRequest $request
      * @return \Illuminate\Http\JsonResponse
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
     public function resetPassword(ResetPasswordRequest $request)
     {
@@ -65,7 +66,7 @@ class PasswordResettingController extends Controller
         );
 
         if ($status !== Password::PASSWORD_RESET) {
-            throw new InternalErrorException('Unable to reset password!');
+            throw new HttpException(500, 'Unable to reset password!');
         }
 
         return response()->json([

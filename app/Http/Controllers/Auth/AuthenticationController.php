@@ -6,10 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\SignInRequest;
 use App\Http\Requests\Auth\SignUpRequest;
 use App\Services\AuthService;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Symfony\Component\CssSelector\Exception\InternalErrorException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class AuthenticationController extends Controller
@@ -48,6 +46,8 @@ class AuthenticationController extends Controller
      *
      * @param  \App\Http\Requests\Auth\SignInRequest  $request
      * @return \Illuminate\Http\JsonResponse
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
     public function signIn(SignInRequest $request)
     {
@@ -57,7 +57,7 @@ class AuthenticationController extends Controller
         $blockedReason = $this->authService->checkMoral($player);
 
         if (!is_null($blockedReason)) {
-            throw new HttpException( 403, 'This account has been blocked! ' . $blockedReason);
+            throw new HttpException(403, 'This account has been blocked! ' . $blockedReason);
         }
 
         $token = $this->authService->createPAT($player);
@@ -76,9 +76,7 @@ class AuthenticationController extends Controller
      */
     public function signOut(Request $request)
     {
-        if (!$this->authService->revokePAT($request->user())) {
-            throw new InternalErrorException('Unable to sign out!');
-        }
+        $this->authService->revokePAT($request->user());
 
         return response()->json([
             'status' => true,

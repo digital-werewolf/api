@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\Player;
 use Illuminate\Support\Facades\Hash;
-use Symfony\Component\CssSelector\Exception\InternalErrorException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class ProfileService
 {
@@ -14,14 +14,14 @@ class ProfileService
      * @param \App\Models\Player $player
      * @param string $newUsername
      *
-     * @throws \Symfony\Component\CssSelector\Exception\InternalErrorException
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
     public function updateUsername(Player $player, string $newUsername)
     {
         $player->username = $newUsername;
 
         if (!$player->save()) {
-            throw new InternalErrorException('Unable to update username!');
+            throw new HttpException('Unable to update username!');
         }
 
         return true;
@@ -33,7 +33,7 @@ class ProfileService
      * @param \App\Models\Player $player
      * @param string $newEmail
      *
-     * @throws \Symfony\Component\CssSelector\Exception\InternalErrorException
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
     public function updateEmail(Player $player, string $newEmail)
     {
@@ -41,7 +41,7 @@ class ProfileService
         $player->email_verified_at = null;
 
         if (!$player->save()) {
-            throw new InternalErrorException('Unable to update email!');
+            throw new HttpException(500, 'Unable to update email!');
         }
 
         $player->sendEmailVerificationNotification();
@@ -55,7 +55,7 @@ class ProfileService
      * @param \App\Models\Player $player
      * @param string $newEmail
      *
-     * @throws \Symfony\Component\CssSelector\Exception\InternalErrorException
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
     public function updatePassword(Player $player, string $newPassword)
     {
@@ -64,7 +64,7 @@ class ProfileService
         $player->password = $hasedPassword;
 
         if (!$player->save()) {
-            throw new InternalErrorException('Unable to update password!');
+            throw new HttpException(500, 'Unable to update password!');
         }
 
         return true;
