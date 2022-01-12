@@ -17,6 +17,7 @@ class CreateBlackPlayersTable extends Migration
             $table->id();
             $table->foreignId('player_id')
                 ->constrained('players')
+                ->unique()
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete();
             $table->text('reason')->default('');

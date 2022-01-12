@@ -25,11 +25,11 @@ class ProfileServiceTest extends TestCase
 
     public function test_update_username()
     {
-        $player = Player::factory()->unverified()->create();
+        $player = Player::factory()->create();
 
-        $rlt = $this->profileSerivce->updateUsername($player, 'new_name');
+        $status = $this->profileSerivce->updateUsername($player, 'new_name');
 
-        $this->assertTrue($rlt);
+        $this->assertTrue($status);
         $this->assertSame('new_name', $player->username);
     }
 
@@ -39,9 +39,9 @@ class ProfileServiceTest extends TestCase
 
         Notification::fake();
 
-        $rlt = $this->profileSerivce->updateEmail($player, 'email@gmail.com');
+        $status = $this->profileSerivce->updateEmail($player, 'email@gmail.com');
 
-        $this->assertTrue($rlt);
+        $this->assertTrue($status);
         $this->assertNull($player->email_verified_at);
 
         Notification::assertSentTo($player, VerifyEmail::class);
@@ -51,9 +51,9 @@ class ProfileServiceTest extends TestCase
     {
         $player = Player::factory()->create();
 
-        $rlt = $this->profileSerivce->updatePassword($player, 'new_password');
+        $status = $this->profileSerivce->updatePassword($player, 'new_password');
 
-        $this->assertTrue($rlt);
+        $this->assertTrue($status);
         $this->assertTrue(Hash::check('new_password', $player->password));
     }
 }

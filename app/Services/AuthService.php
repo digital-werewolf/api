@@ -79,7 +79,9 @@ class AuthService
      */
     public function revokePAT(Player $player)
     {
-        /** @var \App\Models $PAT */
+        /**
+         * @var \App\Models $PAT
+         */
         $PAT = $player->currentAccessToken();
 
         if (!$PAT->delete()) {
@@ -117,10 +119,8 @@ class AuthService
     public function authenticate($credentials)
     {
         $player = Player::where('username', $credentials['usernameOrEmail'])
-            ->orWhere('username', $credentials['usernameOrEmail'])
+            ->orWhere('email', $credentials['usernameOrEmail'])
             ->first();
-
-        var_dump($player->password);
 
         $isCorrectPassword = is_null($player)
             ? false
@@ -150,13 +150,13 @@ class AuthService
         $remainingTime = $this->getLockTime($lock);
 
         if ($remainingTime <= 0) {
-            $this->unlockPlayer($lock);
+            $this->unlockPlayer($player);
 
             return null;
         }
 
         return 'Reason: ' . $lock->reason
-            . '. Automatically unlock after ' . $remainingTime . ' hour(s).';
+            . '. Automatically unlock after ' . round($remainingTime / 60) . ' hour(s).';
     }
 
     /**
@@ -170,18 +170,24 @@ class AuthService
         $now =  Carbon::now(new DateTimeZone('GMT'));
         $expiredAt = Carbon::parse($blackPlayer->expired_at);
 
-        return $now->diffInMinutes($expiredAt);
+        return $now->diffInMinutes($expiredAt, false);
     }
 
     /**
      * Unlock the player.
      *
-     * @param \App\Models\BlackPlayer $blackPlayer
+     * @param \App\Models\Player $player
      * @return bool
      */
-    public function unlockPlayer(BlackPlayer $blackPlayer)
+    public function unlockPlayer(Player $player)
     {
-        return $blackPlayer->delete();
+        $lock = $player->lock;
+
+        if (is_null($lock)) {
+            return false;
+        }
+
+        return $player->lock->delete();
     }
 
     /**

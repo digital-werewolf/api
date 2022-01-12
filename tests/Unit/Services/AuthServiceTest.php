@@ -2,26 +2,19 @@
 
 namespace Tests\Unit\app\Services;
 
+use App\Models\BlackPlayer;
 use App\Models\Player;
 use App\Services\AuthService;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Carbon\Carbon;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
-use Laravel\Sanctum\NewAccessToken;
 use Laravel\Sanctum\PersonalAccessToken;
-use Mockery;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
+use Tests\TestCase;
 
-/**
- * @runTestsInSeparateProcesses
- * @preserveGlobalState disabled
- */
 class AuthServiceTest extends TestCase
 {
-    private array $data;
-
-    private Player $mockPlayer;
+    use RefreshDatabase;
 
     private AuthService $authSerivce;
 
@@ -29,155 +22,205 @@ class AuthServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->data = [
-            'player' => [
-                'username' => 'username',
-                'email' => 'email@email.com',
-                'password' => 'password',
-            ],
-            'credentials' => [
-                'usernameOrEmail' => 'player02',
-                'password' => 'password',
-            ],
-            'hashMakeOptions' => [ 'rounds' => 10 ],
-            'hashedPassword' => 'hashed_password',
-        ];
-
-        // Hash::shouldReceive('make')
-        //     ->with($this->data['player']['password'], $this->data['hashMakeOptions'])
-        //     ->andReturn($this->data['hashedPassword']);
-
         $this->authSerivce = new AuthService();
     }
 
-    // public function test_create_player_successfully()
-    // {
-    //     $this->mockPlayer = Mockery::mock('overload:' . Player::class);
-    //     $this->mockPlayer
-    //         ->shouldReceive('save')
-    //         ->andReturn(true);
-
-    //     $result = $this->authSerivce->createPlayer($this->data['player']);
-    //     $this->assertInstanceOf(Player::class, $result);
-    // }
-
-    // public function test_create_player_failed()
-    // {
-    //     $this->mockPlayer = Mockery::mock('overload:' . Player::class);
-    //     $this->mockPlayer
-    //         ->shouldReceive('save')
-    //         ->andReturn(false);
-
-    //     $this->expectException(HttpException::class);
-    //     $this->authSerivce->createPlayer($this->data['player']);
-    // }
-
-    // public function test_create_oauth_player_successfully()
-    // {
-    //     $this->mockPlayer = Mockery::mock('overload:' . Player::class);
-    //     $this->mockPlayer
-    //         ->shouldReceive('markEmailAsVerified')
-    //         ->andReturn(true);
-
-    //     $result = $this->authSerivce->createOAuthPlayer($this->data['player']['email']);
-    //     $this->assertInstanceOf(Player::class, $result);
-    // }
-
-    // public function test_create_oauth_player_failed()
-    // {
-    //     $this->mockPlayer = Mockery::mock('overload:' . Player::class);
-    //     $this->mockPlayer
-    //         ->shouldReceive('markEmailAsVerified')
-    //         ->andReturn(false);
-
-    //     $this->expectException(HttpException::class);
-    //     $this->authSerivce->createOAuthPlayer($this->data['player']['email']);
-    // }
-
-    // public function test_create_personal_access_token()
-    // {
-    //     $this->mockPlayer = Mockery::mock(Player::class);
-    //     $this->mockPlayer
-    //         ->shouldReceive('createToken')
-    //         ->with('sign-in')
-    //         ->andReturn(new NewAccessToken(new PersonalAccessToken(), 'token_string'));
-
-    //     $result = $this->authSerivce->createPAT($this->mockPlayer);
-    //     $this->assertIsString($result);
-    // }
-
-    // public function test_revoke_current_personal_access_token()
-    // {
-    //     /** @var \Laravel\Sanctum\PersonalAccessToken $mockPAT */
-    //     $mockPAT = Mockery::mock(PersonalAccessToken::class);
-    //     $mockPAT->shouldReceive('delete')
-    //         ->andReturn(true, false);
-
-    //     $this->mockPlayer = Mockery::mock(Player::class);
-    //     $this->mockPlayer
-    //         ->shouldReceive('currentAccessToken')
-    //         ->andReturn($mockPAT);
-
-    //     $result = $this->authSerivce->revokePAT($this->mockPlayer);
-    //     $this->assertTrue($result);
-
-    //     $this->expectException(HttpException::class);
-    //     $this->authSerivce->revokePAT($this->mockPlayer);
-    // }
-
-    // public function test_revole_all_personal_access_tokens()
-    // {
-    //     /** @var \Illuminate\Database\Eloquent\Relations\MorphMany $mockPATs */
-    //     $mockPATs = Mockery::mock(MorphMany::class);
-    //     $mockPATs->shouldReceive('delete')
-    //         ->andReturn(true, false);
-
-    //     $this->mockPlayer = Mockery::mock(Player::class);
-    //     $this->mockPlayer
-    //         ->shouldReceive('tokens')
-    //         ->andReturn($mockPATs);
-
-    //     $result = $this->authSerivce->revokeAllPATs($this->mockPlayer);
-    //     $this->assertTrue($result);
-
-    //     $this->expectException(HttpException::class);
-    //     $this->authSerivce->revokeAllPATs($this->mockPlayer);
-    // }
-
-    public function test_authenticate()
+    public function test_create_player()
     {
-        // /**
-        //  * @var \App\Models\Player $mockPlayer
-        //  */
-        // $mockPlayer = Mockery::mock(Player::class);
-        // $mockPlayer
-        //     ->disableOriginalConstructor()
-        //     ->shouldReceive('password')
-        //         ->andReturn($this->data['player']['password'])
-        //     ->shouldReceive('first')
-        //         ->andReturn(111111);
+        $player = $this->authSerivce->createPlayer([
+            'username' => 'name',
+            'email' => 'email@gmail.com',
+            'password' => 'password',
+        ]);
 
-        $mockPlayer = $this->getMockBuilder(Player::class)
-            ->disableOriginalConstructor();
+        $this->assertInstanceOf(Player::class, $player);
+        $this->assertTrue(Hash::check('password', $player->password));
+    }
 
-        // $this->app->instance(Player::class, $this->mockPlayer);
-        // $this->app->bind(Player::class, function() use ($mockPlayer){
-        //     return $mockPlayer;
-        // });
+    public function test_create_oauth_player_successfully()
+    {
+        $player = $this->authSerivce->createOAuthPlayer('email@gmail.com');
 
-        // $this->authSerivce = $this->app->make(AuthService::class);
+        $this->assertInstanceOf(Player::class, $player);
+        $this->assertSame(10, strlen($player->username));
+        $this->assertNull($player->password);
+    }
 
-        // Hash::shouldReceive('check')
-        //     ->with($this->data['credentials']['password'], $this->data['player']['password'])
-        //     ->andReturn(true, false);
+    public function test_create_personal_access_token()
+    {
+        $player = Player::factory()->create();
 
-        $result = $this->authSerivce->authenticate($this->data['credentials']);
-        $this->assertSame(22222, $result);
+        $token = $this->authSerivce->createPAT($player);
 
-        // $this->expectException(BadRequestHttpException::class);
-        // $this->assertSame($this->mockPlayer, $result);
+        $this->assertIsString($token);
+        $this->assertStringContainsString("|", $token);
+    }
 
-        // $this->expectException(BadRequestHttpException::class);
-        // $this->assertSame($this->mockPlayer, $result);
+    public function test_revoke_current_personal_access_token()
+    {
+        $player = Player::factory()->create();
+        $token = $this->authSerivce->createPAT($player);
+        $player->withAccessToken(PersonalAccessToken::findToken($token));
+
+        $status = $this->authSerivce->revokePAT($player);
+
+        $this->assertTrue($status);
+    }
+
+    public function test_revole_all_personal_access_tokens()
+    {
+        $player = Player::factory()->create();
+        $this->authSerivce->createPAT($player);
+
+        $status = $this->authSerivce->revokeAllPATs($player);
+
+        $this->assertTrue($status);
+    }
+
+    public function test_authenticate_ok()
+    {
+        $player = Player::factory()->create();
+
+        $authenticatedPlayer = $this->authSerivce->authenticate([
+            'usernameOrEmail' => $player->email,
+            'password' => 'password',
+        ]);
+
+        $this->assertInstanceOf(Player::class, $authenticatedPlayer);
+        $this->assertSame($player->email, $authenticatedPlayer->email);
+
+        $authenticatedPlayer = $this->authSerivce->authenticate([
+            'usernameOrEmail' => $player->username,
+            'password' => 'password',
+        ]);
+
+        $this->assertInstanceOf(Player::class, $authenticatedPlayer);
+        $this->assertSame($player->username, $authenticatedPlayer->username);
+    }
+
+    public function test_authenticate_wrong_email()
+    {
+        $this->expectException(BadRequestHttpException::class);
+        $this->authSerivce->authenticate([
+            'usernameOrEmail' => 'random@gmail.com',
+            'password' => 'password',
+        ]);
+    }
+
+    public function test_authenticate_wrong_password()
+    {
+        $player = Player::factory()->create();
+
+        $this->expectException(BadRequestHttpException::class);
+        $this->authSerivce->authenticate([
+            'usernameOrEmail' => $player->username,
+            'password' => 'passwordd',
+        ]);
+    }
+
+    public function test_check_moral_has_not_locked_yet()
+    {
+        $player = Player::factory()->create();
+
+        $lockReason = $this->authSerivce->checkMoral($player);
+
+        $this->assertNull($lockReason);
+    }
+
+    public function test_check_moral_has_locked()
+    {
+        $player = Player::factory()->create();
+        $lock = BlackPlayer::create([
+            'player_id' => $player->id,
+            'reason' => 'Lock reason!!!',
+            'expired_at' => now('GMT')->addMinutes(5),
+        ]);
+
+        $lockReason = $this->authSerivce->checkMoral($player);
+
+        $this->assertIsString($lockReason);
+        $this->assertStringContainsString($lock->reason, $lockReason);
+    }
+
+    public function test_check_moral_time_expired()
+    {
+        $player = Player::factory()->create();
+        BlackPlayer::create([
+            'player_id' => $player->id,
+            'reason' => 'Lock reason!!!',
+            'expired_at' => now('GMT')->subMinutes(5),
+        ]);
+
+        $lockReason = $this->authSerivce->checkMoral($player);
+
+        $this->assertNull($lockReason);
+    }
+
+    public function test_get_lock_time_greater_than_now()
+    {
+        $player = Player::factory()->create();
+        $lock = BlackPlayer::create([
+            'player_id' => $player->id,
+            'reason' => 'Lock reason!!!',
+            'expired_at' => now('GMT')->addMinutes(5),
+        ]);
+
+        $diff = $this->authSerivce->getLockTime($lock);
+
+        $this->assertSame(4, $diff);
+    }
+
+    public function test_get_lock_time_smaller_than_now()
+    {
+        $player = Player::factory()->create();
+        $lock = BlackPlayer::create([
+            'player_id' => $player->id,
+            'reason' => 'Lock reason!!!',
+            'expired_at' => now('GMT')->subMinutes(5),
+        ]);
+
+        $diff = $this->authSerivce->getLockTime($lock);
+
+        $this->assertSame(-5, $diff);
+    }
+
+    public function test_unlock_player_ok()
+    {
+        $player = Player::factory()->create();
+        BlackPlayer::create([
+            'player_id' => $player->id,
+            'reason' => 'Lock reason!!!',
+            'expired_at' => now('GMT'),
+        ]);
+
+        $status = $this->authSerivce->unlockPlayer($player);
+
+        $this->assertTrue($status);
+    }
+
+    public function test_unlock_player_falied()
+    {
+        $player = Player::factory()->create();
+
+        $status = $this->authSerivce->unlockPlayer($player);
+
+        $this->assertFalse($status);
+    }
+
+    public function test_exists_email_ok()
+    {
+        $player = Player::factory()->create();
+
+        $foundPlayer = $this->authSerivce->existEmail($player->email);
+
+        $this->assertInstanceOf(Player::class, $foundPlayer);
+        $this->assertSame($player->email, $foundPlayer->email);
+    }
+
+    public function test_exists_email_failed()
+    {
+        $foundPlayer = $this->authSerivce->existEmail('email@gmail.com');
+
+        $this->assertNull($foundPlayer);
     }
 }
