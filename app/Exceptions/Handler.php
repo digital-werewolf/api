@@ -41,7 +41,7 @@ class Handler extends ExceptionHandler
             //
         });
 
-        $this->renderable(function (Exception $e) {
+        $this->renderable(function (Throwable $e) {
             $message = $e->getMessage()
                 ? $e->getMessage()
                 : 'An unknown error occurred.';
