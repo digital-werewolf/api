@@ -22,8 +22,8 @@ Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
 
     // OAuth
     Route::group(['middleware' => 'web'], function () {
-        Route::get('/{driver}/redirect', 'OAuthController@redirect');
-        Route::get('/{driver}/callback', 'OAuthController@callback');
+        Route::get('/{driver}/redirect', 'OAuthController@redirect')->name('oauth.redirect');
+        Route::get('/{driver}/callback', 'OAuthController@callback')->name('oauth.callback');
     });
 
     // Verify email

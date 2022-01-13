@@ -96,16 +96,10 @@ class AuthService
      *
      * @param \App\Models\Player $player
      * @return bool
-     *
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
     public function revokeAllPATs(Player $player)
     {
-        if(!$player->tokens()->delete()) {
-            throw new HttpException(500, 'Unable to revoke all tokens');
-        }
-
-        return true;
+        return $player->tokens()->delete();
     }
 
     /**

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\Player;
 use App\Services\AuthService;
 use Laravel\Socialite\Facades\Socialite;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -55,10 +54,10 @@ class OAuthController extends Controller
         }
 
         $oauth = Socialite::driver($driver)->user();
-        $player = $this->authService->existEmail($oauth->email);
+        $player = $this->authService->existEmail($oauth->getEmail());
 
         if (is_null($player)) {
-            $player = $this->authService->createOAuthPlayer($oauth->email);
+            $player = $this->authService->createOAuthPlayer($oauth->getEmail());
         }
 
         $token = $this->authService->createPAT($player);

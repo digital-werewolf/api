@@ -8,7 +8,11 @@ use App\Http\Requests\Auth\ResetPasswordRequest;
 use App\Services\AuthService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 class PasswordResettingController extends Controller
 {
@@ -31,7 +35,13 @@ class PasswordResettingController extends Controller
             $request->safe()->only('email'),
         );
 
-        if ($status !== Password::RESET_LINK_SENT) {
+        if ($status === Password::INVALID_USER) {
+            throw new NotFoundHttpException('Email does not exist!');
+        }
+        elseif ($status === Password::RESET_THROTTLED) {
+            throw new UnprocessableEntityHttpException('Please wait a moment!');
+        }
+        else if ($status !== Password::RESET_LINK_SENT) {
             throw new HttpException(500, 'Unable to send password reset email!');
         }
 
@@ -52,7 +62,7 @@ class PasswordResettingController extends Controller
     public function resetPassword(ResetPasswordRequest $request)
     {
         $status = Password::reset(
-            $request->safe()->only('email', 'token', 'password', 'password_confirmation'),
+            $request->safe()->only('email', 'token', 'password'),
             function ($player, $password) {
                 $player->forceFill([
                     'password' => Hash::make($password),
@@ -65,6 +75,9 @@ class PasswordResettingController extends Controller
             },
         );
 
+        if ($status === Password::INVALID_TOKEN) {
+            throw new AccessDeniedHttpException('Invalid token!');
+        }
         if ($status !== Password::PASSWORD_RESET) {
             throw new HttpException(500, 'Unable to reset password!');
         }
