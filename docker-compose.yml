@@ -10,7 +10,7 @@ services:
         networks:
             - webserver-network
             - postgres-network
-            - redis-network
+            # - redis-network
         depends_on:
             - postgres
             # - redis

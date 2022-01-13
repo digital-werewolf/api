@@ -9,7 +9,7 @@ services:
             - ./:/var/www/html
         networks:
             - postgres-network
-            - redis-network
+            # - redis-network
         depends_on:
             - postgres
             # - redis
