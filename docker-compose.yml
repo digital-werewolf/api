@@ -84,4 +84,4 @@ services:
 networks:
     webserver-network:
     postgres-network:
-    redis-network:
+    # redis-network:
