@@ -74,7 +74,7 @@ class AuthServiceTest extends TestCase
 
         $status = $this->authSerivce->revokeAllPATs($player);
 
-        $this->assertTrue($status);
+        $this->assertIsNumeric($status);
     }
 
     public function test_authenticate_ok()

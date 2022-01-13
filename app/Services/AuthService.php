@@ -95,7 +95,7 @@ class AuthService
      * Revoke all Personal Access Tokens of the player.
      *
      * @param \App\Models\Player $player
-     * @return bool
+     * @return int
      */
     public function revokeAllPATs(Player $player)
     {

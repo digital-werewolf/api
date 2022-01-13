@@ -24,7 +24,7 @@ class SignUpRequest extends CustomFormRequest
     public function rules()
     {
         return [
-            'username' => 'required|min:2|max:10|unique:players',
+            'username' => 'required|min:2|max:20|unique:players',
             'email' => 'required|max:50|email|unique:players',
             'password' => 'required|min:5|confirmed',
         ];

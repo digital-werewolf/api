@@ -75,7 +75,7 @@ class ProfileTest extends TestCase
         // Too long
         $response = $this->putJson('api/profile/username',
         [
-            'username' => 'usernameeeeeeeee'
+            'username' => 'usernameeeeeeeeeeeeeeeeeeeee'
         ],
         [
             'Authorization' => 'Bearer ' . $token,

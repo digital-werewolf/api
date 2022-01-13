@@ -59,7 +59,7 @@ class SignUpTest extends TestCase
 
         // Too long
         $response = $this->postJson('/api/auth/sign-up', [
-            'username' => 'usernameeeeeeeeeeeee',
+            'username' => 'usernameeeeeeeeeeeeeeeeeeeeeeeee',
             'email' => 'email@gmail.com',
             'password' => 'password',
             'password_confirmation' => 'password',
