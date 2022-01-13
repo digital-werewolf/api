@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+    api:
+        build:
+            context: ./.docker
+        image: werewolf-api:dev-latest
+        volumes:
+            - ./:/var/www/html
+        networks:
+            - postgres-network
+            - redis-network
+        depends_on:
+            - postgres
+            # - redis
+        restart: unless-stopped
+
+    postgres:
+        image: postgres:14.1-alpine3.15
+        environment:
+            - POSTGRES_DB=ww_db_test
+            - POSTGRES_USER=${DB_USERNAME}
+            - POSTGRES_PASSWORD=${DB_PASSWORD}
+        networks:
+            - postgres-network
+        restart: unless-stopped
+
+    # redis:
+    #     image: redis:6.2.5-alpine3.14
+    #     environment:
+    #         - REDIS_PASSWORD=${REDIS_PASSWORD}
+    #     command: redis-server --requirepass ${REDIS_PASSWORD}
+    #     networks:
+    #         - redis-network
+    #     restart: unless-stopped
+
+networks:
+    postgres-network:
+    # redis-network:
