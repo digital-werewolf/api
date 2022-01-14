@@ -7,7 +7,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
-class BlackPlayerSeeder extends Seeder
+class LockSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -16,7 +16,7 @@ class BlackPlayerSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('black_players')->insert([
+        DB::table('locks')->insert([
             [
                 'player_id' => 3,
                 'reason' => Str::random(20),

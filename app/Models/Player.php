@@ -34,6 +34,6 @@ class Player extends Authenticatable implements MustVerifyEmail, CanResetPasswor
      */
     public function lock()
     {
-        return $this->hasOne(BlackPlayer::class);
+        return $this->hasOne(Lock::class);
     }
 }

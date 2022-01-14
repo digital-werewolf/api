@@ -2,10 +2,9 @@
 
 namespace Tests\Unit\app\Services;
 
-use App\Models\BlackPlayer;
+use App\Models\Lock;
 use App\Models\Player;
 use App\Services\AuthService;
-use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\PersonalAccessToken;
@@ -130,7 +129,7 @@ class AuthServiceTest extends TestCase
     public function test_check_moral_has_locked()
     {
         $player = Player::factory()->create();
-        $lock = BlackPlayer::create([
+        $lock = Lock::create([
             'player_id' => $player->id,
             'reason' => 'Lock reason!!!',
             'expired_at' => now('GMT')->addMinutes(5),
@@ -145,7 +144,7 @@ class AuthServiceTest extends TestCase
     public function test_check_moral_time_expired()
     {
         $player = Player::factory()->create();
-        BlackPlayer::create([
+        Lock::create([
             'player_id' => $player->id,
             'reason' => 'Lock reason!!!',
             'expired_at' => now('GMT')->subMinutes(5),
@@ -159,7 +158,7 @@ class AuthServiceTest extends TestCase
     public function test_get_lock_time_greater_than_now()
     {
         $player = Player::factory()->create();
-        $lock = BlackPlayer::create([
+        $lock = Lock::create([
             'player_id' => $player->id,
             'reason' => 'Lock reason!!!',
             'expired_at' => now('GMT')->addMinutes(5),
@@ -173,7 +172,7 @@ class AuthServiceTest extends TestCase
     public function test_get_lock_time_smaller_than_now()
     {
         $player = Player::factory()->create();
-        $lock = BlackPlayer::create([
+        $lock = Lock::create([
             'player_id' => $player->id,
             'reason' => 'Lock reason!!!',
             'expired_at' => now('GMT')->subMinutes(5),
@@ -187,7 +186,7 @@ class AuthServiceTest extends TestCase
     public function test_unlock_player_ok()
     {
         $player = Player::factory()->create();
-        BlackPlayer::create([
+        Lock::create([
             'player_id' => $player->id,
             'reason' => 'Lock reason!!!',
             'expired_at' => now('GMT'),

@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\BlackPlayer;
+use App\Models\Lock;
 use App\Models\Player;
 use Carbon\Carbon;
 use DateTimeZone;
@@ -156,13 +156,13 @@ class AuthService
     /**
      * Get remaining lock time of the player in minutes.
      *
-     * @param \App\Models\BlackPlayer $blackPlayer
+     * @param \App\Models\Lock $lock
      * @return int
      */
-    public function getLockTime(BlackPlayer $blackPlayer)
+    public function getLockTime(Lock $lock)
     {
         $now =  Carbon::now(new DateTimeZone('GMT'));
-        $expiredAt = Carbon::parse($blackPlayer->expired_at);
+        $expiredAt = Carbon::parse($lock->expired_at);
 
         return $now->diffInMinutes($expiredAt, false);
     }
