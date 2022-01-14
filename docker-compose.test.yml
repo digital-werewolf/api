@@ -5,13 +5,15 @@ services:
         build:
             context: ./.docker
         image: werewolf-api:dev-latest
+        user: root
         volumes:
             - ./:/var/www/html
         networks:
             - postgres-network
-            - redis-network
+            # - redis-network
         depends_on:
-            - postgres
+            postgres:
+                condition: service_healthy
             # - redis
         restart: unless-stopped
 
@@ -23,6 +25,11 @@ services:
             - POSTGRES_PASSWORD=${DB_PASSWORD}
         networks:
             - postgres-network
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
         restart: unless-stopped
 
     # redis:
