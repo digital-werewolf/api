@@ -38,8 +38,9 @@ class LockService
             return null;
         }
 
-        return 'Reason: ' . $lock->reason
-            . '. Automatically unlock after ' . round($remainingTime / 60) . ' hour(s).';
+        return $lock->action->message
+            . ' Reason: ' . $lock->reason . '.'
+            . ' Automatically unlock after ' . round($remainingTime / 60) . ' hour(s).';
     }
 
     /**

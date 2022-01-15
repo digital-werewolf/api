@@ -18,6 +18,7 @@ class LockedActionSeeder extends Seeder
             [
                 'title' => 'sign-in',
                 'description' => 'Lock sign in action.',
+                'message' => 'This account has been blocked!',
             ],
         ]);
     }

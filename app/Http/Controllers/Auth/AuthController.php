@@ -58,10 +58,10 @@ class AuthController extends Controller
         $validated = $request->validated();
 
         $player = $this->authService->authenticate($validated);
-        $blockedReason = $this->lockService->isLocked($player, 'sign-in');
+        $lockedReason = $this->lockService->isLocked($player, 'sign-in');
 
-        if (!is_null($blockedReason)) {
-            throw new HttpException(403, 'This account has been blocked! ' . $blockedReason);
+        if (!is_null($lockedReason)) {
+            throw new HttpException(403, $lockedReason);
         }
 
         $token = $this->authService->createPAT($player);
