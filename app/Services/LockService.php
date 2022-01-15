@@ -21,7 +21,7 @@ class LockService
         $lock = Lock::where('player_id', $player->id)
             ->with('action')
             ->whereHas('action', function ($query) use ($action) {
-                $query->where('title', $action);
+                $query->where('name', $action);
             })
             ->first();
 

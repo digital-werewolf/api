@@ -16,7 +16,7 @@ class LockedActionSeeder extends Seeder
     {
         DB::table('locked_actions')->insert([
             [
-                'title' => 'sign-in',
+                'name' => 'sign-in',
                 'description' => 'Lock sign in action.',
                 'message' => 'This account has been blocked!',
             ],

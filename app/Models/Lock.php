@@ -9,12 +9,6 @@ class Lock extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'player_id',
-        'reason',
-        'expired_at',
-    ];
-
     protected $casts = [
         'expired_at' => 'datetime',
     ];

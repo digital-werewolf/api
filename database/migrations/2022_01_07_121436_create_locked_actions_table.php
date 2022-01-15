@@ -15,7 +15,7 @@ class CreateLockedActionsTable extends Migration
     {
         Schema::create('locked_actions', function (Blueprint $table) {
             $table->id();
-            $table->string('title', 50)->unique();
+            $table->string('name', 50)->unique();
             $table->text('description')->default('');
             $table->text('message')->default('');
             $table->timestamp('created_at')->useCurrent();

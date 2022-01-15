@@ -20,7 +20,7 @@ class ProfileServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->profileSerivce = new ProfileService();
+        $this->profileSerivce = $this->app->make(ProfileService::class);
     }
 
     public function test_update_username()
