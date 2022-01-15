@@ -26,6 +26,8 @@ class CreateLocksTable extends Migration
             $table->text('reason')->default('');
             $table->timestamp('expired_at');
             $table->timestamp('created_at')->useCurrent();
+
+            $table->unique(['player_id', 'action_id']);
         });
     }
 

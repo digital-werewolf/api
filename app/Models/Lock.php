@@ -20,4 +20,9 @@ class Lock extends Model
     ];
 
     public $timestamps = false;
+
+    public function action()
+    {
+        return $this->belongsTo(LockedAction::class, 'action_id');
+    }
 }
