@@ -2,8 +2,11 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Models\Lock;
+use App\Models\LockedAction;
 use App\Models\Player;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
@@ -89,5 +92,25 @@ class SignInTest extends TestCase
         ]);
 
         $response->assertStatus(400);
+    }
+
+    public function test_sign_in_with_locked_player()
+    {
+        $player = Player::factory()->create();
+        $lockedAction = LockedAction::factory()->create([
+            'name' => 'sign-in',
+        ]);
+        Lock::factory()->create([
+            'player_id' => $player->id,
+            'action_id' => $lockedAction->id,
+            'expired_at' => now('GMT')->addMinutes(5),
+        ]);
+
+        $response = $this->postJson('/api/auth/sign-in', [
+            'usernameOrEmail' => $player->username,
+            'password' => 'password',
+        ]);
+
+        $response->assertForbidden();
     }
 }

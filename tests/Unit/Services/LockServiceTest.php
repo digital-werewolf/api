@@ -7,7 +7,6 @@ use App\Models\LockedAction;
 use App\Models\Player;
 use App\Services\LockService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Tests\TestCase;
 
