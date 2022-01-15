@@ -17,7 +17,10 @@ class CreateLocksTable extends Migration
             $table->id();
             $table->foreignId('player_id')
                 ->constrained('players')
-                ->unique()
+                ->cascadeOnUpdate()
+                ->cascadeOnDelete();
+            $table->foreignId('action_id')
+                ->constrained('locked_actions')
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete();
             $table->text('reason')->default('');

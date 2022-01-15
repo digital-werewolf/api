@@ -19,14 +19,16 @@ class LockSeeder extends Seeder
         DB::table('locks')->insert([
             [
                 'player_id' => 3,
+                'action_id' => 1,
                 'reason' => Str::random(20),
-                'expired_at' => Carbon::createFromFormat('m/d/Y', '20/12/2099'),
+                'expired_at' => Carbon::createFromFormat('m/d/Y', '20/12/3000'),
                 'created_at' => now(),
             ],
             [
                 'player_id' => 5,
+                'action_id' => 1,
                 'reason' => Str::random(20),
-                'expired_at' => Carbon::createFromFormat('m/d/Y', '20/12/2099'),
+                'expired_at' => Carbon::createFromFormat('m/d/Y', '20/12/3000'),
                 'created_at' => now(),
             ],
         ]);

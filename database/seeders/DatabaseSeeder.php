@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             PlayerSeeder::class,
+            LockedActionSeeder::class,
             LockSeeder::class,
         ]);
     }
