@@ -13,8 +13,6 @@ class Lock extends Model
         'expired_at' => 'datetime',
     ];
 
-    public $timestamps = false;
-
     public function action()
     {
         return $this->belongsTo(LockedAction::class, 'action_id');

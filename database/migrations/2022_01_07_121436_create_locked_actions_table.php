@@ -18,7 +18,7 @@ class CreateLockedActionsTable extends Migration
             $table->string('name', 50)->unique();
             $table->text('description')->default('');
             $table->text('message')->default('');
-            $table->timestamp('created_at')->useCurrent();
+            $table->timestamps();
         });
     }
 

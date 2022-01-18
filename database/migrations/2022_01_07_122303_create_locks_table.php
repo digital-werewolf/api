@@ -25,7 +25,7 @@ class CreateLocksTable extends Migration
                 ->cascadeOnDelete();
             $table->text('reason')->default('');
             $table->timestamp('expired_at');
-            $table->timestamp('created_at')->useCurrent();
+            $table->timestamps();
 
             $table->unique(['player_id', 'action_id']);
         });
