@@ -2,10 +2,9 @@
 
 namespace Tests\Unit\app\Services;
 
-use App\Models\BlackPlayer;
+use App\Models\Lock;
 use App\Models\Player;
 use App\Services\AuthService;
-use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\PersonalAccessToken;
@@ -22,7 +21,7 @@ class AuthServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->authSerivce = new AuthService();
+        $this->authSerivce = $this->app->make(AuthService::class);
     }
 
     public function test_create_player()
@@ -74,7 +73,7 @@ class AuthServiceTest extends TestCase
 
         $status = $this->authSerivce->revokeAllPATs($player);
 
-        $this->assertIsNumeric($status);
+        $this->assertGreaterThan(0, $status);
     }
 
     public function test_authenticate_ok()
@@ -116,111 +115,5 @@ class AuthServiceTest extends TestCase
             'usernameOrEmail' => $player->username,
             'password' => 'passwordd',
         ]);
-    }
-
-    public function test_check_moral_has_not_locked_yet()
-    {
-        $player = Player::factory()->create();
-
-        $lockReason = $this->authSerivce->checkMoral($player);
-
-        $this->assertNull($lockReason);
-    }
-
-    public function test_check_moral_has_locked()
-    {
-        $player = Player::factory()->create();
-        $lock = BlackPlayer::create([
-            'player_id' => $player->id,
-            'reason' => 'Lock reason!!!',
-            'expired_at' => now('GMT')->addMinutes(5),
-        ]);
-
-        $lockReason = $this->authSerivce->checkMoral($player);
-
-        $this->assertIsString($lockReason);
-        $this->assertStringContainsString($lock->reason, $lockReason);
-    }
-
-    public function test_check_moral_time_expired()
-    {
-        $player = Player::factory()->create();
-        BlackPlayer::create([
-            'player_id' => $player->id,
-            'reason' => 'Lock reason!!!',
-            'expired_at' => now('GMT')->subMinutes(5),
-        ]);
-
-        $lockReason = $this->authSerivce->checkMoral($player);
-
-        $this->assertNull($lockReason);
-    }
-
-    public function test_get_lock_time_greater_than_now()
-    {
-        $player = Player::factory()->create();
-        $lock = BlackPlayer::create([
-            'player_id' => $player->id,
-            'reason' => 'Lock reason!!!',
-            'expired_at' => now('GMT')->addMinutes(5),
-        ]);
-
-        $diff = $this->authSerivce->getLockTime($lock);
-
-        $this->assertSame(4, $diff);
-    }
-
-    public function test_get_lock_time_smaller_than_now()
-    {
-        $player = Player::factory()->create();
-        $lock = BlackPlayer::create([
-            'player_id' => $player->id,
-            'reason' => 'Lock reason!!!',
-            'expired_at' => now('GMT')->subMinutes(5),
-        ]);
-
-        $diff = $this->authSerivce->getLockTime($lock);
-
-        $this->assertSame(-5, $diff);
-    }
-
-    public function test_unlock_player_ok()
-    {
-        $player = Player::factory()->create();
-        BlackPlayer::create([
-            'player_id' => $player->id,
-            'reason' => 'Lock reason!!!',
-            'expired_at' => now('GMT'),
-        ]);
-
-        $status = $this->authSerivce->unlockPlayer($player);
-
-        $this->assertTrue($status);
-    }
-
-    public function test_unlock_player_falied()
-    {
-        $player = Player::factory()->create();
-
-        $status = $this->authSerivce->unlockPlayer($player);
-
-        $this->assertFalse($status);
-    }
-
-    public function test_exists_email_ok()
-    {
-        $player = Player::factory()->create();
-
-        $foundPlayer = $this->authSerivce->existEmail($player->email);
-
-        $this->assertInstanceOf(Player::class, $foundPlayer);
-        $this->assertSame($player->email, $foundPlayer->email);
-    }
-
-    public function test_exists_email_failed()
-    {
-        $foundPlayer = $this->authSerivce->existEmail('email@gmail.com');
-
-        $this->assertNull($foundPlayer);
     }
 }

@@ -16,9 +16,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
     // Authenticate
-    Route::post('/sign-up', 'AuthenticationController@signUp');
-    Route::post('/sign-in', 'AuthenticationController@signIn');
-    Route::post('/sign-out', 'AuthenticationController@signOut');
+    Route::post('/sign-up', 'AuthController@signUp');
+    Route::post('/sign-in', 'AuthController@signIn');
+    Route::post('/sign-out', 'AuthController@signOut');
 
     // OAuth
     Route::group(['middleware' => 'web'], function () {

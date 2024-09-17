@@ -6,17 +6,21 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\SignInRequest;
 use App\Http\Requests\Auth\SignUpRequest;
 use App\Services\AuthService;
+use App\Services\LockService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class AuthenticationController extends Controller
+class AuthController extends Controller
 {
     private AuthService $authService;
 
-    public function __construct(AuthService $authService)
+    private LockService $lockService;
+
+    public function __construct(AuthService $authService, LockService $lockService)
     {
         $this->authService = $authService;
+        $this->lockService = $lockService;
 
         $this->middleware('auth:sanctum')->only(['signOut']);
     }
@@ -54,10 +58,10 @@ class AuthenticationController extends Controller
         $validated = $request->validated();
 
         $player = $this->authService->authenticate($validated);
-        $blockedReason = $this->authService->checkMoral($player);
+        $lockedReason = $this->lockService->isLocked($player, 'sign-in');
 
-        if (!is_null($blockedReason)) {
-            throw new HttpException(403, 'This account has been blocked! ' . $blockedReason);
+        if (!is_null($lockedReason)) {
+            throw new HttpException(403, $lockedReason);
         }
 
         $token = $this->authService->createPAT($player);

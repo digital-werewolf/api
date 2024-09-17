@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Services\AuthService;
+use App\Services\PlayerService;
 use Laravel\Socialite\Facades\Socialite;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -16,7 +17,9 @@ class OAuthController extends Controller
 
     private AuthService $authService;
 
-    public function __construct(AuthService $authService)
+    private PlayerService $playerService;
+
+    public function __construct(AuthService $authService, PlayerService $playerService)
     {
         $this->supportedDriver = [
             'github',
@@ -25,6 +28,7 @@ class OAuthController extends Controller
         ];
 
         $this->authService = $authService;
+        $this->playerService = $playerService;
     }
 
     /**
@@ -54,7 +58,7 @@ class OAuthController extends Controller
         }
 
         $oauth = Socialite::driver($driver)->user();
-        $player = $this->authService->existEmail($oauth->getEmail());
+        $player = $this->playerService->existEmail($oauth->getEmail());
 
         if (is_null($player)) {
             $player = $this->authService->createOAuthPlayer($oauth->getEmail());

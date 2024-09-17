@@ -7,7 +7,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
-class BlackPlayerSeeder extends Seeder
+class LockSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -16,17 +16,19 @@ class BlackPlayerSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('black_players')->insert([
+        DB::table('locks')->insert([
             [
                 'player_id' => 3,
+                'action_id' => 1,
                 'reason' => Str::random(20),
-                'expired_at' => Carbon::createFromFormat('m/d/Y', '20/12/2099'),
+                'expired_at' => Carbon::createFromFormat('m/d/Y', '20/12/3000'),
                 'created_at' => now(),
             ],
             [
                 'player_id' => 5,
+                'action_id' => 1,
                 'reason' => Str::random(20),
-                'expired_at' => Carbon::createFromFormat('m/d/Y', '20/12/2099'),
+                'expired_at' => Carbon::createFromFormat('m/d/Y', '20/12/3000'),
                 'created_at' => now(),
             ],
         ]);

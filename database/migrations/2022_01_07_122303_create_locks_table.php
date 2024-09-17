@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateBlackPlayersTable extends Migration
+class CreateLocksTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,16 +13,21 @@ class CreateBlackPlayersTable extends Migration
      */
     public function up()
     {
-        Schema::create('black_players', function (Blueprint $table) {
+        Schema::create('locks', function (Blueprint $table) {
             $table->id();
             $table->foreignId('player_id')
                 ->constrained('players')
-                ->unique()
+                ->cascadeOnUpdate()
+                ->cascadeOnDelete();
+            $table->foreignId('action_id')
+                ->constrained('locked_actions')
                 ->cascadeOnUpdate()
                 ->cascadeOnDelete();
             $table->text('reason')->default('');
             $table->timestamp('expired_at');
-            $table->timestamp('created_at')->useCurrent();
+            $table->timestamps();
+
+            $table->unique(['player_id', 'action_id']);
         });
     }
 
@@ -33,6 +38,6 @@ class CreateBlackPlayersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('black_players');
+        Schema::dropIfExists('locks');
     }
 }

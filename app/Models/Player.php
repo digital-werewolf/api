@@ -32,8 +32,8 @@ class Player extends Authenticatable implements MustVerifyEmail, CanResetPasswor
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function lock()
+    public function locks()
     {
-        return $this->hasOne(BlackPlayer::class);
+        return $this->hasMany(Lock::class);
     }
 }
